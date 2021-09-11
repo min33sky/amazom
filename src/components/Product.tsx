@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { IProduct } from 'typings/amazom';
 import Image from 'next/image';
 import { StarIcon } from '@heroicons/react/solid';
+import { useDispatch } from 'react-redux';
+import { addToBasket } from 'slices/basketSlice';
 
 const MAX_RATING = 5;
 const MIN_RATING = 1;
 
 function Product({ id, category, description, image, price, title }: IProduct) {
+  const dispatch = useDispatch();
   const [rating, setRating] = useState(
     Math.floor(Math.random() * (MAX_RATING - MIN_RATING + 1)) + MIN_RATING
   );
 
   const [hasPrime, setHasPrime] = useState(Math.random() < 0.5);
+
+  const handleAddItemToBasket = useCallback(() => {
+    const product: IProduct = {
+      id,
+      category,
+      description,
+      image,
+      price,
+      title,
+      rating,
+      hasPrime,
+    };
+    dispatch(addToBasket(product));
+  }, [category, description, dispatch, hasPrime, id, image, price, rating, title]);
 
   return (
     <div className="relative z-30 flex flex-col p-10 m-5 bg-white">
@@ -37,7 +54,9 @@ function Product({ id, category, description, image, price, title }: IProduct) {
         </div>
       )}
 
-      <button className="mt-auto button">Add to Basket</button>
+      <button onClick={handleAddItemToBasket} className="mt-auto button">
+        Add to Basket
+      </button>
     </div>
   );
 }

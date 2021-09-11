@@ -1,13 +1,29 @@
 import React from 'react';
 import Image from 'next/image';
 import { MenuIcon, SearchIcon, ShoppingCartIcon } from '@heroicons/react/outline';
+import { signIn, signOut, useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
+import { selectItems } from 'slices/basketSlice';
 
 function Header() {
+  const [session] = useSession();
+  const items = useSelector(selectItems);
+  const router = useRouter();
+
+  const onClickCredentials = () => {
+    if (session?.user) {
+      signOut();
+    } else {
+      signIn();
+    }
+  };
+
   return (
     <header>
       {/* Top nav */}
-      <div className="flex items-center bg-amazon_blue p-1 flex-grow py-2">
-        <div className="flex flex-grow mt-2 items-center sm:flex-grow-0">
+      <div className="flex items-center flex-grow p-1 py-2 bg-amazon_blue">
+        <div className="flex items-center flex-grow mt-2 sm:flex-grow-0">
           <Image
             src="https://links.papareact.com/f90"
             width={150}
@@ -15,53 +31,54 @@ function Header() {
             alt="logo img"
             objectFit="contain"
             className="cursor-pointer"
+            onClick={() => router.push('/')}
           />
         </div>
 
         {/* search */}
-        <div className="hidden sm:flex items-center rounded-md bg-yellow-400 cursor-pointer hover:bg-yellow-500 h-10 outline-none flex-grow">
+        <div className="items-center flex-grow hidden h-10 bg-yellow-400 rounded-md outline-none cursor-pointer sm:flex hover:bg-yellow-500">
           <input
             type="text"
-            className="p-2 h-full w-6 flex-grow flex-shrink rounded-l-md focus:outline-none"
+            className="flex-grow flex-shrink w-6 h-full p-2 rounded-l-md focus:outline-none"
           />
           <SearchIcon className="h-12 p-4" />
         </div>
 
         {/* right */}
-        <div className="text-white flex items-center text-xs space-x-6 mx-6 whitespace-nowrap">
-          <div className="link">
-            <p>Hello min</p>
+        <div className="flex items-center mx-6 space-x-6 text-xs text-white whitespace-nowrap">
+          <div onClick={onClickCredentials} className="link">
+            <p>{session?.user ? session.user.name : 'Sign In'}</p>
             <p className="font-extrabold md:text-sm">Account & Lists</p>
           </div>
           <div className="link">
             <p>Returns</p>
             <p className="font-extrabold md:text-sm">& Orders</p>
           </div>
-          <div className="link relative flex items-center">
-            <span className="absolute top-0 right-0 md:right-10 h-4 w-4 text-center bg-yellow-400 rounded-full items-center text-black font-bold">
-              0
+          <div onClick={() => router.push('/checkout')} className="relative flex items-center link">
+            <span className="absolute top-0 right-0 items-center w-4 h-4 font-bold text-center text-black bg-yellow-400 rounded-full md:right-10">
+              {items.length}
             </span>
             <ShoppingCartIcon className="h-10" />
-            <p className="hidden md:inline font-extrabold md:text-sm">Basket</p>
+            <p className="hidden font-extrabold md:inline md:text-sm">Basket</p>
           </div>
         </div>
       </div>
 
       {/* Bottom nav */}
-      <div className="flex items-center space-x-3 p-2 pl-6 bg-amazon_blue-light text-white font-bold">
-        <p className="flex link items-center">
+      <div className="flex items-center p-2 pl-6 space-x-3 font-bold text-white bg-amazon_blue-light">
+        <p className="flex items-center link">
           <MenuIcon className="h-6 mr-1" />
           All
         </p>
         <p className="link">Prime Video</p>
         <p className="link">Amazon Business</p>
         <p className="link">Today's Deals</p>
-        <p className="link hidden lg:inline-flex">Electronics</p>
-        <p className="link hidden lg:inline-flex">Food & Grocery</p>
-        <p className="link hidden lg:inline-flex">Prime</p>
-        <p className="link hidden lg:inline-flex">Buy Again</p>
-        <p className="link hidden lg:inline-flex">Shopper Toolkit</p>
-        <p className="link hidden lg:inline-flex">Health & Personal Care</p>
+        <p className="hidden link lg:inline-flex">Electronics</p>
+        <p className="hidden link lg:inline-flex">Food & Grocery</p>
+        <p className="hidden link lg:inline-flex">Prime</p>
+        <p className="hidden link lg:inline-flex">Buy Again</p>
+        <p className="hidden link lg:inline-flex">Shopper Toolkit</p>
+        <p className="hidden link lg:inline-flex">Health & Personal Care</p>
       </div>
     </header>
   );

@@ -8,4 +8,7 @@ export interface IProduct {
   image: string;
   price: number;
   title: number;
+  //? 새로 추가한 속성
+  hasPrime?: boolean;
+  rating?: number;
 }
